@@ -6,6 +6,7 @@ hanoi :: Int -> Peg -> Peg -> Peg -> [Move]
 hanoi 1 a b _ = [(a, b)]
 hanoi n a b c = if n <= 0 then [] else hanoi (n - 1) a c b ++ [(a, b)] ++ hanoi (n - 1) c b a
 
+-- 错误的解法
 hanoi' :: Int -> Peg -> Peg -> Peg -> Peg -> [Move]
 hanoi' 1 a b _ _ = [(a, b)]
 hanoi' 2 a b c _ = [(a, c), (a, b), (c, b)]
