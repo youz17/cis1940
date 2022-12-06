@@ -3,8 +3,9 @@
 module Calc where
 
 import Data.Function ((&))
-import ExprT
-import Parser
+import Data.Map qualified as M
+import ExprT (ExprT (..))
+import Parser (parseExp)
 
 eval :: ExprT -> Integer
 eval (Add a b) = eval a + eval b
@@ -62,3 +63,41 @@ testMM = testExp :: Maybe MinMax
 
 testSat :: Maybe Mod7
 testSat = testExp :: Maybe Mod7
+
+--- expr var
+
+data ExprVarT
+  = VarLit Integer
+  | VarAdd ExprVarT ExprVarT
+  | VarMul ExprVarT ExprVarT
+  | Var String
+  deriving (Show, Eq)
+
+class HasVars a where
+  var :: String -> a
+
+instance Expr ExprVarT where
+  lit = VarLit
+  add = VarAdd
+  mul = VarMul
+
+instance HasVars ExprVarT where
+  var = Var
+
+type ExprVarType = (M.Map String Integer -> Maybe Integer)
+
+type VarTable = M.Map String Integer
+
+instance HasVars ExprVarType where
+  var = M.lookup
+
+instance Expr ExprVarType where
+  lit :: Integer -> ExprVarType
+  lit i _ = Just i
+  add :: ExprVarType -> ExprVarType -> VarTable -> Maybe Integer
+  add a b m = (+) <$> a m <*> b m
+  mul :: ExprVarType -> ExprVarType -> ExprVarType
+  mul a b m = (*) <$> a m <*> b m
+
+withVars :: [(String, Integer)] -> ExprVarType -> Maybe Integer
+withVars vs e = e $ M.fromList vs
