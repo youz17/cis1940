@@ -51,8 +51,11 @@ instance Num (Stream Integer) where
   fromInteger n = Cons n (streamRepeat 0)
   negate = streamMap negate
 
+intStreamDivInt :: Integer -> Stream Integer -> Stream Integer
+intStreamDivInt n = streamMap (`div` n)
+
 instance Fractional (Stream Integer) where
-  (/) a@(Cons a0 sa) b@(Cons b0 sb) = Cons (a0 `div` b0) ((sa - sb * (a / b)) / fromInteger b0)
+  (/) a@(Cons a0 sa) b@(Cons b0 sb) = Cons (a0 `div` b0) (intStreamDivInt b0 (sa - sb * (a / b)))
 
 x :: Stream Integer
 x = Cons 0 (Cons 1 (streamRepeat 0))
