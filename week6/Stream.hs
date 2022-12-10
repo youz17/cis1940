@@ -55,7 +55,9 @@ intStreamDivInt :: Integer -> Stream Integer -> Stream Integer
 intStreamDivInt n = streamMap (`div` n)
 
 instance Fractional (Stream Integer) where
-  (/) a@(Cons a0 sa) b@(Cons b0 sb) = Cons (a0 `div` b0) (intStreamDivInt b0 (sa - sb * (a / b)))
+  (/) (Cons a0 sa) (Cons b0 sb) = res
+    where
+      res = Cons (a0 `div` b0) (intStreamDivInt b0 (sa - sb * res))
 
 x :: Stream Integer
 x = Cons 0 (Cons 1 (streamRepeat 0))
