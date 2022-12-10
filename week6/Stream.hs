@@ -51,8 +51,14 @@ instance Num (Stream Integer) where
   fromInteger n = Cons n (streamRepeat 0)
   negate = streamMap negate
 
+instance Fractional (Stream Integer) where
+  (/) a@(Cons a0 sa) b@(Cons b0 sb) = Cons (a0 `div` b0) ((sa - sb * (a / b)) / fromInteger b0)
+
 x :: Stream Integer
 x = Cons 0 (Cons 1 (streamRepeat 0))
+
+fib3 :: Stream Integer
+fib3 = x / (1 - x - x ^ (2 :: Integer))
 
 showPolynomial :: Stream Integer -> String
 showPolynomial = helper 0
