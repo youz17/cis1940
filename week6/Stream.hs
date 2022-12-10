@@ -57,9 +57,6 @@ instance Fractional (Stream Integer) where
 x :: Stream Integer
 x = Cons 0 (Cons 1 (streamRepeat 0))
 
-fib3 :: Stream Integer
-fib3 = x / (1 - x - x ^ (2 :: Integer))
-
 showPolynomial :: Stream Integer -> String
 showPolynomial = helper 0
   where

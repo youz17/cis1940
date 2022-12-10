@@ -1,5 +1,7 @@
 {-# OPTIONS_GHC -Wall #-}
 
+import Stream (Stream, x)
+
 fib :: Integer -> Integer
 fib 1 = 0
 fib 2 = 1
@@ -14,8 +16,8 @@ fibs2 :: [Integer]
 fibs2 = map fst $ iterate (\(a, b) -> (b, a + b)) (0, 1)
 
 -- 这个是网上抄的
-fibs3 :: [Integer]
-fibs3 = 0 : 1 : zipWith (+) fibs3 (tail fibs3)
+fibs2' :: [Integer]
+fibs2' = 0 : 1 : zipWith (+) fibs2' (tail fibs2')
 
 newtype Matrix = Matrix ((Integer, Integer), (Integer, Integer))
 
@@ -34,6 +36,9 @@ instance Num Matrix where
   signum = undefined
   fromInteger = undefined
   negate = undefined
+
+fibs3 :: Stream Integer
+fibs3 = x / (1 - x - x ^ (2 :: Integer))
 
 fib4 :: Integer -> Integer
 fib4 n = helper (Matrix ((1, 1), (1, 0)) ^ n)
