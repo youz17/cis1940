@@ -15,6 +15,8 @@ tag (Single m _) = m
 tag (Append m _ _) = m
 
 (+++) :: Monoid m => JoinList m a -> JoinList m a -> JoinList m a
+l +++ Empty = l
+Empty +++ r = r
 l +++ r = Append (tag l <> tag r) l r
 
 sizeJ :: (Sized m, Monoid m) => JoinList m b -> Int
