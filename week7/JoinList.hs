@@ -47,6 +47,14 @@ takeJ n (Append _ l r) =
   where
     lsize = sizeJ l
 
+{-
+todo:
+  这个逻辑显然是可以抽出来的, 不过有必要吗？
+  if n <= lsize then f l r n else g l r n
+  where
+    lsize = sizeJ l
+-}
+
 -- for test
 jlToList :: JoinList m a -> [a]
 jlToList Empty = []
