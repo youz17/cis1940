@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module JoinList where
 
 import Sized
@@ -26,6 +28,7 @@ sizeJ (Append s _ _) = getSize (size s)
 
 indexJ :: (Sized b, Monoid b) => Int -> JoinList b a -> Maybe a
 indexJ 0 (Single _ v) = Just v
+indexJ _ (Single _ _) = Nothing
 indexJ _ Empty = Nothing
 indexJ n (Append _ l r) = if n <= lsize then indexJ n l else indexJ (n - lsize) r
   where
@@ -33,19 +36,19 @@ indexJ n (Append _ l r) = if n <= lsize then indexJ n l else indexJ (n - lsize) 
 
 dropJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 dropJ 0 j = j
-dropJ 1 (Single _ _) = Empty
 dropJ n (Append _ l r) =
   if n > lsize then dropJ (n - lsize) r else dropJ n l +++ r
   where
     lsize = sizeJ l
+dropJ _ _ = Empty -- drop n(n>=1) (Single|Empty) = Empty
 
 takeJ :: (Sized b, Monoid b) => Int -> JoinList b a -> JoinList b a
 takeJ 0 _ = Empty
-takeJ 1 j@(Single _ _) = j
 takeJ n (Append _ l r) =
   if n <= lsize then takeJ n l else l +++ takeJ (n - lsize) r
   where
     lsize = sizeJ l
+takeJ _ j = j -- take n(n>=1) j@(Single|Empty) = j
 
 {-
 todo:
@@ -64,5 +67,5 @@ jlToList (Append _ l1 l2) = jlToList l1 ++ jlToList l2
 (!!?) :: [a] -> Int -> Maybe a
 [] !!? _ = Nothing
 _ !!? i | i < 0 = Nothing
-(x : xs) !!? 0 = Just x
-(x : xs) !!? i = xs !!? (i - 1)
+(x : _) !!? 0 = Just x
+(_ : xs) !!? i = xs !!? (i - 1)
