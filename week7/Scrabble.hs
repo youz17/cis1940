@@ -1,10 +1,9 @@
 {-# OPTIONS_GHC -Wall #-}
 
-module Scrabble (Score, score, scoreString, scoreLine) where
+module Scrabble (Score (Score), score, scoreString) where
 
 import Data.Char (toUpper)
 import Data.Set qualified as S
-import JoinList (JoinList (Single))
 
 newtype Score = Score Int
   deriving (Eq, Ord, Show, Num)
@@ -52,6 +51,3 @@ score c
 
 scoreString :: String -> Score
 scoreString = sum . map score
-
-scoreLine :: String -> JoinList Score String
-scoreLine s = Single (scoreString s) s
