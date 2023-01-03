@@ -1,13 +1,14 @@
 {- CIS 194 HW 10
    due Monday, 1 April
 -}
-
-{-# OPTIONS_GHC -wall #-}
+{-# OPTIONS_GHC -Wall #-}
 
 module AParser where
 
-import Control.Applicative
+import Control.Applicative (Alternative)
 import Data.Char
+import Data.Functor ((<&>))
+import GHC.Base (Alternative (..))
 
 -- A parser for a value of type a is a function which takes a String
 -- represnting the input to be parsed, and succeeds or fails; if it
@@ -59,3 +60,48 @@ posInt = Parser f
 ------------------------------------------------------------
 -- Your code goes below here
 ------------------------------------------------------------
+
+first :: (a -> b) -> (a, c) -> (b, c)
+first f (a, c) = (f a, c)
+
+instance Functor Parser where
+  fmap f (Parser p) = Parser (fmap (first f) . p) -- Parser (\s -> (first f) <$> p s)
+
+instance Applicative Parser where
+  pure x = Parser (const (Just (x, "")))
+
+  -- p1 <*> p2 = Parser (\s ->
+  --   case runParser p1 s of
+  --     Nothing -> Nothing
+  --     Just (f, ss) ->
+  --       case runParser p2 ss of
+  --         Nothing -> Nothing
+  --         Just (a, sss) -> Just (f a, sss))
+  p1 <*> p2 = Parser pp
+    where
+      pp s = runParser p1 s >>= helper
+      helper (f, s) = runParser p2 s <&> first f
+
+-- 网上抄的解法
+-- pf <*> px = Parser f
+--   where f str = case runParser pf str of
+--           Nothing       -> Nothing
+--           Just (fr, sr) -> fmap (first fr) (runParser px sr)
+
+abParser :: Parser (Char, Char)
+abParser = (,) <$> char 'a' <*> char 'b'
+
+abParser_ :: Parser ()
+abParser_ = (\_ _ -> ()) <$> char 'a' <*> char 'b'
+
+intPair :: Parser [Integer]
+intPair = (\a _ c -> [a, c]) <$> posInt <*> char ' ' <*> posInt
+
+instance Alternative Parser where
+  empty = Parser (const Nothing)
+  p1 <|> p2 = Parser (\s -> runParser p1 s <|> runParser p2 s)
+
+intOrUppercase :: Parser ()
+intOrUppercase = (ignore <$> posInt) <|> (ignore <$> satisfy isUpper)
+  where
+    ignore = const ()
