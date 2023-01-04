@@ -7,7 +7,6 @@ module AParser where
 
 import Control.Applicative (Alternative)
 import Data.Char
-import Data.Functor ((<&>))
 import GHC.Base (Alternative (..))
 
 -- A parser for a value of type a is a function which takes a String
@@ -68,7 +67,7 @@ instance Functor Parser where
   fmap f (Parser p) = Parser (fmap (first f) . p) -- Parser (\s -> (first f) <$> p s)
 
 instance Applicative Parser where
-  pure x = Parser (const (Just (x, "")))
+  pure x = Parser (\s -> Just (x, s))
 
   -- p1 <*> p2 = Parser (\s ->
   --   case runParser p1 s of
@@ -80,7 +79,8 @@ instance Applicative Parser where
   p1 <*> p2 = Parser pp
     where
       pp s = runParser p1 s >>= helper
-      helper (f, s) = runParser p2 s <&> first f
+      -- helper (f, s) = runParser p2 s <&> first f
+      helper (f, s) = runParser (f <$> p2) s
 
 -- 网上抄的解法
 -- pf <*> px = Parser f
