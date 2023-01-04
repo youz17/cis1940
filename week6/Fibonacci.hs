@@ -20,7 +20,7 @@ fibs2' :: [Integer]
 fibs2' = 0 : 1 : zipWith (+) fibs2' (tail fibs2')
 
 fibs3 :: Stream Integer
-fibs3 = x / (1 - x - x ^ (2 :: Integer))
+fibs3 = x / (1 - x - x ^ (2 :: Int))
 
 newtype Matrix = Matrix ((Integer, Integer), (Integer, Integer))
 
